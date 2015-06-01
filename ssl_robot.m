@@ -1,26 +1,26 @@
 function xp=ssl_robot(t,X,U)
 x=X(1:7);
-N=76/20; %                                                                   >>need measuring
-res=1.2;%ohm
-km=25.5/1000; %Nm/A
-kn=374; %rpm/V
-kf=0.0001;%unknown                                                         >>modeling needed
-ks=0.1;%unknown
-r=28.5/1000; %m                                                            >>need measuring
-J=0.0192; %kg/m2%           >>modeling needed
-Jm=92.5/1000/10000; %kg/m2
-Jw=0.00233; %kg/m2        >>modeling needed
-d=0.084; %m         
-M=1.5; %kg         >>need measuring
-a1=56.31/180*pi;     % rad
+N=76/20;                     %                                           
+res=1.2;                     %ohm
+km=25.5/1000;                %Nm/A
+kn=374;                      %rpm/V
+kf=0.0001;                   %unknown 
+ks=0.1;                      %unknown
+r=28.5/1000;                 %m           
+J=0.0192;                    %kg/m2%           >>modeling needed
+Jm=92.5/1000/10000;          %kg/m2
+Jw=0.0000233;                %kg/m2        >>modeling needed
+d=0.084;                     %m         
+M=1.5;                       %kg         >>need measuring
+a1=56.31/180*pi;   % rad
 a2=135/180*pi;     % rad
 a3=225/180*pi;     % rad     
-a4=303.69/180*pi;     % rad     
+a4=303.69/180*pi;  % rad     
 
-g1=20.01/180*pi;     % rad   
+g1=20.01/180*pi; % rad   
 g2=0/180*pi;     % rad   
 g3=0/180*pi;     % rad   
-g4=20.01/180*pi;     % rad   
+g4=20.01/180*pi; % rad   
 
 %z=[a1 a2-a1 a3-a2 a4-a3 2*pi-a4];
 %pie(z);
