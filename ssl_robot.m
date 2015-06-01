@@ -1,5 +1,5 @@
 function xp=ssl_robot(t,X,U)
-
+x=X(1:7);
 N=3.8; %                                                                   >>need measuring
 res=1.2;%ohm
 km=25.5/1000; %Nm/A
@@ -87,6 +87,7 @@ B(7,4)=ca;
 C=eye(7,7);
  
 D=zeros(7,4);
+% solve(det(s*eye(7,7)-A))
 % if(t<40)
 %     U=[12;12;-12;-12]*sin(t/10);%[0;0;0;0];%
 % end
@@ -104,15 +105,39 @@ Vd=[1;1;0];
      (-Vd(1,1)*sin(a2)+Vd(2,1)*cos(a2)+Vd(3,1)*sin(g2)*d)*b
      (-Vd(1,1)*sin(a3)+Vd(2,1)*cos(a3)+Vd(3,1)*sin(g3)*d)*b 
      (-Vd(1,1)*sin(a4)+Vd(2,1)*cos(a4)+Vd(3,1)*sin(g4)*d)*b
- ];
+ ]
  
-Q=diag([1,1,1,1,1,1,1]);
-R=diag([.01,.01,.01,.01]);
- 
-Klqr=lqr(A,B,Q,R);
-U=(inv(B'*B)*B'*A*inv(C'*C)*C'+Klqr*inv(C'*C)*C')*Yd;
- 
-Acl=A-B*Klqr;
+% % x.=A*dx+B*du
+% % dy=C*dx
+% % 
+% % 0=A*xd+B*ud
+% % yd=C*xd
 
-xp=Acl*X+B*U;
+% % xd=inv(C'*C)*C'*yd
+% % ud=-inv(B'*B)*B'*A*xd
+
+
+
+% % Q=diag([1,1,1,1,1,1,1]);
+% % R=diag([.01,.01,.01,.01]);
+Q=diag([1,1,1,1,1,1,1]);
+R=diag([1/144,1/144,1/144,1/144]);
+pd= [ -25, -25, -60, -80, -25, -25, -100];
+ 
+% Klqr=lqr(A,B,Q,R);
+% U=(inv(B'*B)*B'*A*inv(C'*C)*C'+Klqr*inv(C'*C)*C')*Yd;
+%  
+% Acl=A-B*Klqr;
+% 
+% xp=Acl*X+B*U;
+Klqr1=place(A,B,pd);
+Klqr=lqr(A,B,Q,R);
+xd=inv(C'*C)*C'*Yd;
+ud=-inv(B'*B)*B'*A*xd;
+du=-Klqr1*(x-xd)*0;
+u=ud+du
+
+xp=A*x+B*u;
+ 
+y=C*x;
 end
