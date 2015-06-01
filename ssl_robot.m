@@ -1,15 +1,15 @@
 function xp=ssl_robot(t,X,U)
 x=X(1:7);
-N=3.8; %                                                                   >>need measuring
+N=76/20; %                                                                   >>need measuring
 res=1.2;%ohm
 km=25.5/1000; %Nm/A
 kn=374; %rpm/V
 kf=0.0001;%unknown                                                         >>modeling needed
 ks=0.1;%unknown
-r=25.5/1000; %m                                                            >>need measuring
+r=28.5/1000; %m                                                            >>need measuring
 J=0.0192; %kg/m2%           >>modeling needed
 Jm=92.5/1000/10000; %kg/m2
-Jw=0.0000233; %kg/m2        >>modeling needed
+Jw=0.00233; %kg/m2        >>modeling needed
 d=0.084; %m         
 M=1.5; %kg         >>need measuring
 a1=56.31/180*pi;     % rad
@@ -100,7 +100,7 @@ D=zeros(7,4);
 % end
 %%kinematics rules that should be considered
 %%for Specifying desierd output
-Vd=[1;1;0];
+Vd=[8^.5;8^.5;0];
  Yd=[Vd;(-Vd(1,1)*sin(a1)+Vd(2,1)*cos(a1)+Vd(3,1)*sin(g1)*d)*b
      (-Vd(1,1)*sin(a2)+Vd(2,1)*cos(a2)+Vd(3,1)*sin(g2)*d)*b
      (-Vd(1,1)*sin(a3)+Vd(2,1)*cos(a3)+Vd(3,1)*sin(g3)*d)*b 
@@ -122,7 +122,7 @@ Vd=[1;1;0];
 % % R=diag([.01,.01,.01,.01]);
 Q=diag([1,1,1,1,1,1,1]);
 R=diag([1/144,1/144,1/144,1/144]);
-pd= [ -25, -25, -60, -80, -25, -25, -100];
+pd= [ -25, -5, -60, -80, -20, -10, -215];%[ -25, -25, -60, -80, -25, -25, -100];
  
 % Klqr=lqr(A,B,Q,R);
 % U=(inv(B'*B)*B'*A*inv(C'*C)*C'+Klqr*inv(C'*C)*C')*Yd;
@@ -130,11 +130,13 @@ pd= [ -25, -25, -60, -80, -25, -25, -100];
 % Acl=A-B*Klqr;
 % 
 % xp=Acl*X+B*U;
-Klqr1=place(A,B,pd);
-Klqr=lqr(A,B,Q,R);
+Klqr1=place(A,B,pd)*0;% pole correction
+Klqr=lqr(A,B,Q,R);%lqr
+
+
 xd=inv(C'*C)*C'*Yd;
 ud=-inv(B'*B)*B'*A*xd;
-du=-Klqr1*(x-xd)*0;
+du=-Klqr1*(x-xd);
 u=ud+du
 
 xp=A*x+B*u;
