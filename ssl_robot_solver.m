@@ -1,10 +1,13 @@
 clear all
 clf, echo on
-tspan=[0 1];
+tspan=[0 2];
 x0=[0;0;0;0;0;0;0];
+global output;
+global i;
+i=zeros(4,1);
 [t,x] = ode45(@ssl_robot,tspan, x0, ...
     odeset('OutputFcn','odeplot','MaxStep',1e-2)); 
-
+output
 
 figure;
 hold all
