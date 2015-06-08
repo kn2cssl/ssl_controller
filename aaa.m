@@ -157,154 +157,162 @@ u=ud+du;
 
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 global p_overflow Setpoint_d Setpoint_last PID_Err Setpoint RPM Setpoint_change Setpoint_bridge Setpoint_miss d_last d Setpoint_track kd Mkp;
-    kp=.20; %base kp for setpoints over 500 rpm
-	kp2=1; %base kp for setpoints below 500 rpm
+    kp=.20; %%base Mkp(ii) for setpoints over 500 rpm
+	kp2=1;  %%base Mkp(ii) for setpoints below 500 rpm
 	pwm_top = 255;
-	lim1 = 1; %this limit determine when M.kp should increase ,also when M.kd should change.
-	lim2 = 10; %this limit determine accuracy of rpm 
-	lim3 = 300 ; % setpont_bridge limit : err larger than lim3 
+	lim1 = 15; %%this limit determine when Mkp(ii) should increase ,also when kd should change.
+	lim2 = 10; %%this limit determine accuracy of rpm 
+	lim3 = 300 ; %% setpont_bridge limit : err larger than lim3 
 	lim4 = 400;
     for ii=1:4
 	Setpoint(ii) = Yd(ii+3) ;
-    RPM(ii)=X(ii+3);
+    d(ii)=X(ii+3)-RPM(ii);
+    RPM(ii) = X(ii+3);
+    
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%stage.1 : input stage
 	% :)
 	Setpoint_d(ii) = Setpoint(ii) - Setpoint_last(ii) ;
-	PID_Err(ii) = Setpoint(ii) - RPM(ii) ;%+ 20 *sign(Setpoint(ii));
+	PID_Err(ii) = Setpoint(ii) - RPM(ii) + 15 *sign(Setpoint);
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%stage.2 : status determination  
 	% in this stage few conditions are specified which will be used in next stage.
-		if (Setpoint_change(ii) == 1 &&  abs(PID_Err(ii)) > lim3)
+		if (Setpoint_change(ii) == 1) && ( abs(PID_Err(ii)) > lim3)
 		
 			Setpoint_bridge(ii) = 1;
-		end
+        end
 		
 		if (Setpoint_bridge(ii) == 1 && abs(PID_Err(ii)) < lim3)
 		
 			Setpoint_bridge(ii) = 0;
 			Setpoint_miss(ii) = 1;
-		end
+        end
 		
 		if (Setpoint_miss(ii) == 1 && sign(d_last(ii)) ~= sign(d(ii)))
 		
 			Setpoint_miss(ii) = 0;
 			Setpoint_track(ii) = 1;
-		end
+        end
 
 		
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%stage.3 : kp & kd tuning
+	%stage.3 : Mkp(ii) & kd tuning
 
-		if (p_overflow(ii) == 0)
+     if (p_overflow(ii) == 0)
+            
 		
-			if (abs(d(ii)) < 15 && abs(PID_Err(ii)) > lim4 && abs(RPM(ii))>10) 
-                Mkp(ii)=Mkp(ii)+.003;
-            end
-			if (abs(d(ii)) < 15 && abs(PID_Err(ii)) < lim4 && abs(PID_Err(ii)) > lim1 &&  abs(RPM(ii))>10 ) 
-                Mkp(ii)=Mkp(ii)+.009;
-            end
-		end
+         if (abs(d(ii)) < 15 && abs(PID_Err(ii)) > lim4 && abs(RPM(ii))>10)
+            Mkp(ii)=Mkp(ii)+.003;
+         end
+            
+         if (abs(d(ii)) < 15 && abs(PID_Err(ii)) < lim4 && abs(PID_Err(ii)) > lim1 &&  abs(RPM(ii))>10 )
+            Mkp(ii)=Mkp(ii)+.001;
+         end
+     end
 
-		if (abs(RPM(ii)) > abs(Setpoint(ii)))
+	if (abs(RPM(ii)) > abs(Setpoint(ii)))
+		if (abs(PID_Err(ii)) < lim4 && abs(PID_Err(ii)) > lim2 && abs(RPM(ii))>10  && abs(Setpoint(ii)) > 499 )
+          Mkp(ii)=Mkp(ii)-.007;  
+        end
+        
+        if (abs(PID_Err(ii)) < lim4 && abs(PID_Err(ii)) > lim2 && abs(Setpoint(ii)) < 499 ) 
+            Mkp(ii)=Mkp(ii)-.0001;
+        end
+        
+        if (Mkp(ii) < kp )
+            Mkp(ii) = kp ;
+        end
+    end
 		
-			if (abs(d(ii)) < lim2 && abs(PID_Err(ii)) < lim4 && abs(PID_Err(ii)) > lim2 && abs(RPM(ii))>10  && abs(Setpoint(ii)) > 499 )
-                Mkp(ii)=Mkp(ii)-.007;
-            end
-			if (abs(d(ii)) < lim2 && abs(PID_Err(ii)) < lim4 && abs(PID_Err(ii)) > lim2 && abs(Setpoint(ii)) < 499 ) 
-                Mkp(ii)=Mkp(ii)-.0001;
-            end
-			if (Mkp(ii) < kp ) 
-                Mkp(ii) = kp ;
-            end
-		end
+    if (abs(Mkp(ii) * PID_Err(ii)) > pwm_top)
+
+        Mkp(ii) = abs((pwm_top) / PID_Err(ii)) ;
+    end
 		
-		if (abs(Mkp(ii) * PID_Err(ii)) > pwm_top)
-		
-			Mkp(ii) = abs((pwm_top+10) / PID_Err(ii)) ;
-		end
-		
-	if (abs(RPM(ii))<50)
-	
-		if (abs(Setpoint(ii)) > 499)
-		
-			Mkp(ii) = kp;
-		
-		else
-		
-			Mkp(ii) = kp2;
-		end
-		
-	end
+    
+%     if (abs(RPM(ii))<50)
+% 	
+%         if (abs(Setpoint(ii)) > 499)
+% 		
+% 		Mkp(ii) = kp;
+%         
+%         else
+% % 		Mkp(ii) = kp2;
+% %         end
+%         
+% 		
+%     end
 	
 % 	if (abs(Setpoint(ii))<500)
 % 	
 % 		Mkp(ii) = 1;
-% 	end
+%     end
 	
 	if (abs(Setpoint_d(ii)) > abs(d(ii)) && abs(PID_Err(ii)) > 200)
 	
 		Mkp(ii) = Mkp(ii) + abs(Setpoint_d(ii) - d(ii))*.01;
-	end
+    end
 	
-		
-% 	if (Setpoint_track(ii))
-% 	
-% 		M.kd = 0 ;
-% 	end
+
 	
 	if (Setpoint_miss(ii))
 	
-		M.kd = 50 ;
-	end
+		kd(ii) = 50 ;
+    end
 	
 	if (Setpoint_track(ii))
 	
-		M.kd = 2 ;
+		kd(ii) = 2 ;
 		if (abs(Setpoint(ii)) < 500)
 		
-			M.kd = 1 ;
-		end
-	end
+			kd(ii) = 1 ;
 		
+        end
+    end
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%stage.4 : PD controller
 	%here we have a conventional pd controller  
-	p = (PID_Err(ii)) * Mkp(ii);	
+	p = PID_Err(ii) * Mkp(ii)
 	
 	p_overflow(ii) = 0;
 	if (abs(p) > pwm_top)
 	
 		p = sign(p) * pwm_top ;
 		p_overflow(ii) = 1;
-	end
-	
-% 	d(ii)=(d(ii)>2400)?(2400):d(ii);
-% 	d(ii)=(d(ii)<-2400)?(2400):d(ii);
-	
-	PID =p - (d(ii) * kd(ii)) ;
-	
-	if (PID>pwm_top)
-        PID=pwm_top;
     end
-	if ( PID<-pwm_top)
-        PID=-pwm_top;
+	
+% 	d=(d>2400)?(2400):d;
+% 	d=(d<-2400)?(2400):d;
+	
+	PID =p -(d(ii) * kd(ii)) ;
+	
+	if(PID>pwm_top)
+	PID=pwm_top;
     end
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	if( PID<-pwm_top)
+	PID=-pwm_top;
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%stage.5 : data storage
 	% :)
-    %M.PID_last = PID ;
-	%M.p_last = M.p;
-	%PID_Err_last = PID_Err(ii) ;
+    %PID_last = PID ;
+	%p_last = p;
+	%PID_Err_last = PID_Err ;
 	Setpoint_change(ii) = 0;
 	if (Setpoint_last(ii) ~= Setpoint(ii) )
 	
 		Setpoint_change(ii) = 1;
 		Setpoint_track(ii) = 0;
-	end
+    end
 	Setpoint_last(ii) = Setpoint(ii) ;
-
-	u(ii)= PID*12.6/255 ;
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%stage.6 : output stage
+	% the controller returns pw "if" term prevents robot from vibration when it should halt.
+% 	if((Setpoint)==0 && abs(RPM-(Setpoint))<10)
+% 	return 0;
+% 		
+% 	return PID ;
+    u(ii)= PID*12.6/255;
     end
     global Akp
 	Akp=[Akp Mkp];
