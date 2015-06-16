@@ -184,7 +184,7 @@ y=C*x;
 
 %full observer=============================================================
 %::nose 10%
-y=yn;
+%y=yn;
 %::
 xh=X(8:14);
 Ah=A;
@@ -250,11 +250,10 @@ xu = [xu;(si+Gl*xm)'];
 global xno
 xno = [xno;xn'];
 
-xl=xn;
-xl(7,1)=(si+Gl*xm);
+xl=[xn;xl(7,1)=(si+Gl*xm);
 
 global err
-err = err + abs(x-xh);
+err = err + abs(x-xl);
 
 flag=1;
 end
