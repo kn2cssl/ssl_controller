@@ -2,6 +2,17 @@ function Xp=ssl_robot(t,X)
 global flag
 %===================================================dynamic model of system
 x=X(1:7);
+
+xn=x+(2*rand(7,1)-ones(7,1)).*x/10;%noisy data of sensors
+
+xm=xn(1:6);%
+xl=xn;
+global Gl
+si=X(15);
+xl(7,1)=(si+Gl*xm);
+
+xh=X(8:14);% Full order kalman observer output
+
 N=76/20;                     %                                           
 res=1.2;                     %ohm
 km=25.5/1000;                %Nm/A
@@ -118,7 +129,7 @@ if(2<t)
 end
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-%==kinematics rules that should be considered for Specifying desierd output
+%==kinematics rules that should be considered for specifying desierd output
  Yd=[Vd
      (-Vd(1,1)*sin(a1)+Vd(2,1)*cos(a1)+Vd(3,1)*sin(g1)*d)*b
      (-Vd(1,1)*sin(a2)+Vd(2,1)*cos(a2)+Vd(3,1)*sin(g2)*d)*b
@@ -152,7 +163,8 @@ end
 
 xd=(C'*C)\C'*Yd;%inv(C'*C)*C'*Yd;
 ud=-inv(B'*B)*B'*A*xd;
-du=-K*(x-xd);
+% du=-K*(x-xd);%for simulating controller with unnoisy data 
+du=-K*(xl-xd);%for simulating controller and observer:(x-xd)|(xh-xd)|(xl-xd)
 u=ud+du;
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -176,15 +188,25 @@ for e=1:4
     end
 end
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 xp=A*x+B*u;
 
-xn=x+(2*rand(7,1)-ones(7,1)).*x/10;
 yn=C*xn; 
 y=C*x;
 
+%RLS=======================================================================
+global p;
+global b;
+yk=x';
+xk=[x;u]'
+%theta=[A B]'
+
+
+%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 %full observer=============================================================
 %::nose 10%
-%y=yn;
+y=yn;
 %::
 xh=X(8:14);
 Ah=A;
@@ -205,7 +227,7 @@ if flag==0
 end
 
 
-xhp=Ah*xh+Bh*uh+G*(y-Ch*xh);
+xhp=zeros(7,1);%Ah*xh+Bh*uh+G*(y-Ch*xh);
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %luenberger observer=======================================================
@@ -221,7 +243,6 @@ Bm=B(1:6,:);
 Bu=B(7,:);
 Dh=D;
 uh=u;
-global Gl
 if flag == 0
 Vl=diag([0.05^2 0.05^2 0.01^2 100 100 100]);
 Wl=diag([0.01]);
@@ -250,10 +271,11 @@ xu = [xu;(si+Gl*xm)'];
 global xno
 xno = [xno;xn'];
 
-xl=[xn;xl(7,1)=(si+Gl*xm);
+xl=xn;
+xl(7,1)=(si+Gl*xm);
 
 global err
-err = err + abs(x-xl);
+err = err + abs(x-xh);
 
 flag=1;
 end

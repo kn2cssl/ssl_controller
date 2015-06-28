@@ -22,6 +22,7 @@ global xu;
 flag = 0 ;
 T=zeros(0,0);
 err = zeros(7,1);
+Gl = zeros(1,6);
 xno = zeros(0,7);
 setpoint = zeros(0,3);
 i=zeros(4,1);
@@ -43,13 +44,14 @@ kd=zeros(4,1);
 
 
 [t,x] = ode45(@ssl_robot,tspan, x0, ...
-    odeset('OutputFcn','odeplot','MaxStep',1e+3)); 
+    odeset('OutputFcn','odeplot','MaxStep',1e-3)); 
 
 figure;
 hold all
-%model output
-plot(t,x(:,1)*1000,'g','LineWidth',2)
 
+plot(T,setpoint(:,1)'*1000,'c:','LineWidth',2)
+%model output
+plot(t,x(:,1)*1000,'r','LineWidth',2)
 plot(t,x(:,2)*1000,'g','LineWidth',2)
 plot(t,x(:,3)*1000,'g','LineWidth',2)
 plot(t,x(:,4),'g','LineWidth',2)
@@ -57,17 +59,17 @@ plot(t,x(:,5),'g','LineWidth',2)
 plot(t,x(:,6),'g','LineWidth',2)
 plot(t,x(:,7),'g','LineWidth',2)
 % % % % %Luenberger observer output
-plot(T,xu,'b:','LineWidth',2)
+% plot(T,xu,'b:','LineWidth',2)
 
 % Full order observer output
-plot(t,x(:,8)*1000,'r:','LineWidth',2)
-plot(t,x(:,9)*1000,'r:','LineWidth',2)
-plot(t,x(:,10)*1000,'r:','LineWidth',2)
-plot(t,x(:,11),'r:','LineWidth',2)
-plot(t,x(:,12),'r:','LineWidth',2)
-plot(t,x(:,13),'r:','LineWidth',2)
-plot(t,x(:,13),'r:','LineWidth',2)
-plot(t,x(:,14),'r:','LineWidth',2)
+% plot(t,x(:,8)*1000,'r:','LineWidth',2)
+% plot(t,x(:,9)*1000,'r:','LineWidth',2)
+% plot(t,x(:,10)*1000,'r:','LineWidth',2)
+% plot(t,x(:,11),'r:','LineWidth',2)
+% plot(t,x(:,12),'r:','LineWidth',2)
+% plot(t,x(:,13),'r:','LineWidth',2)
+% plot(t,x(:,13),'r:','LineWidth',2)
+% plot(t,x(:,14),'r:','LineWidth',2)
 
 
 
@@ -80,11 +82,12 @@ plot(t,x(:,14),'r:','LineWidth',2)
 % plot(T,xno(:,6),'y:','LineWidth',2)
 % plot(T,xno(:,7),'y:','LineWidth',2)
 
-% plot(T',setpoint(1,:)'*1000,'c:','LineWidth',2)
+
 xlabel('Time (sec)')
 ylabel('State Variables')
+legend('setpoint (mm/s)','Vx (mm/s)','State Variables')
 % legend('x (mm)','y (mm)','\theta (rad/1000)','\omega_1 (rpm)','\omega_2 (rpm)','\omega_3 (rpm)','\omega_4 (rpm)','setpoint (mm)')
-legend('Real data','Luenberger observer output','noisy data if there was a sensor')
+% legend('Real data','Luenberger observer output','noisy data if there was a sensor')
 set(findall(figure(1),'type','line'),'linewidth',2)
 
 % % controller output(voltage)
@@ -95,7 +98,7 @@ set(findall(figure(1),'type','line'),'linewidth',2)
 % set(findall(figure(3),'type','line'),'linewidth',2)
 
 % err 
-figure;
-bar(log(err))
-ylabel('log(abs(err))')
-xlabel('system outputs : Luenberger observer output + noisy data')%Full order observer output
+% figure;
+% bar(log(err))
+% ylabel('log(abs(err))')
+% xlabel('system outputs : Luenberger observer output + noisy data')%Full order observer output
