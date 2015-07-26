@@ -1,6 +1,6 @@
 clear all
 clf, echo on
-tspan=[0 5];
+tspan=[0 12];
 % x0=[0.5;1;0.1;474;-3553;-1184;3262;0;0;0;0;0;0;0;0];
 x0=[0;0;0;0;0;0;0;0;0;0;0;0;0;0;0];
 % x0=[0;0;0;0;0;0;1000];
@@ -19,6 +19,15 @@ global i;
 global err;
 global T;
 global xu;
+%RLS==========
+global p;
+global q;
+global theta;
+theta = zeros(11,7);
+q=zeros(11,7);
+p=eye(11)*1000 ;
+
+%;;;;;;;;;;;;;
 flag = 0 ;
 T=zeros(0,0);
 err = zeros(7,1);

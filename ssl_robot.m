@@ -1,5 +1,6 @@
 function Xp=ssl_robot(t,X)
 global flag
+global T;
 %===================================================dynamic model of system
 x=X(1:7);
 
@@ -125,8 +126,13 @@ if (t<2)
     Vd=[2;0;0];
 end
 if(2<t)
-     Vd=[2*sin(2*t);0;0];
+     Vd=[0;0;4];[2*sin(2*t);0;0];
 end
+if(4<t)
+     Vd=[0;2;0];
+end
+%!!!!!!!!!!!!!!
+
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %==kinematics rules that should be considered for specifying desierd output
@@ -136,15 +142,23 @@ end
      (-Vd(1,1)*sin(a3)+Vd(2,1)*cos(a3)+Vd(3,1)*sin(g3)*d)*b 
      (-Vd(1,1)*sin(a4)+Vd(2,1)*cos(a4)+Vd(3,1)*sin(g4)*d)*b
  ];
+
+if(6<t)
+     Yd=[0;0;0;1000;0;0;0];
+end
+if(8<t)
+     Yd=[0;0;0;0;1000;0;0];
+end
+if(10<t)
+     Yd=[0;0;0;0;0;1000;0];
+end
+if(12<t)
+     Yd=[0;0;0;0;0;0;1000];
+end
+
+
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-% % x.=A*dx+B*du
-% % dy=C*dx
-% % 
-% % 0=A*xd+B*ud
-% % yd=C*xd
-% % xd=inv(C'*C)*C'*yd
-% % ud=-inv(B'*B)*B'*A*xd
 
 %============================================================state feedback
 global K
@@ -163,8 +177,8 @@ end
 
 xd=(C'*C)\C'*Yd;%inv(C'*C)*C'*Yd;
 ud=-inv(B'*B)*B'*A*xd;
-% du=-K*(x-xd);%for simulating controller with unnoisy data 
-du=-K*(xl-xd);%for simulating controller and observer:(x-xd)|(xh-xd)|(xl-xd)
+du=-K*(x-xd);%for simulating controller with unnoisy data 
+%du=-K*(xl-xd);%for simulating controller and observer:(x-xd)|(xh-xd)|(xl-xd)
 u=ud+du;
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -190,9 +204,40 @@ end
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 xp=A*x+B*u;
+% xp=[A B]*[x;u];
 
 yn=C*xn; 
 y=C*x;
+
+%RLS=======================================================================
+global p;
+global q;
+global theta;
+yk=xp';
+xk=[x;u]';
+%u=
+
+%theta=[A B]'
+landa=0.99999;
+   p=p/landa-(p*(xk'*xk)*p)/(landa+xk*p*xk')/landa
+   q=q+xk'*yk;     
+                        %x1 
+                        %x2
+                        %x3
+                        %x4
+                        %x5
+             %     q=q+[%x6]*[y1 y2 y3 y4 y5 y6 y7 y8 y9 y10 y11]
+                        %x7
+                        %x8
+                        %x9
+                        %x10
+                        %x11
+                      
+   theta(:,:)=p*q;
+
+
+
+%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %full observer=============================================================
 %::nose 10%
@@ -217,7 +262,7 @@ if flag==0
 end
 
 
-xhp=zeros(7,1);%Ah*xh+Bh*uh+G*(y-Ch*xh);
+xhp=A*x+B*u;%!!!!!!Ah*xh+Bh*uh+G*(y-Ch*xh);
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %luenberger observer=======================================================
@@ -240,7 +285,7 @@ Wl=diag([0.01]);
 Gl=lqr(Auu',Amu',Wl,Vl)';
 end
 
-sip=(Auu-Gl*Amu)*si+(Auu*Gl+Aum-Gl*Amm-Gl*Amu*Gl)*xm+(Bu-Gl*Bm)*uh;
+sip=0;%!!!!!!(Auu-Gl*Amu)*si+(Auu*Gl+Aum-Gl*Amm-Gl*Amu*Gl)*xm+(Bu-Gl*Bm)*uh;
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Xp=[xp;xhp;sip];
@@ -249,7 +294,7 @@ Xp=[xp;xhp;sip];
 global setpoint;
 setpoint=[setpoint;Vd'];
 
-global T;
+
 T=[T;t];
 
 global output
