@@ -26,15 +26,15 @@ Jm=92.5/1000/10000;          %kg/m2
 Jw=0.0000233;                %kg/m2        >>modeling needed
 d=0.084;                     %m         
 M=1.5;                       %kg         >>need measuring
-a1=56.31/180*pi;   % rad
-a2=135/180*pi;     % rad
-a3=225/180*pi;     % rad     
-a4=303.69/180*pi;  % rad     
+a1=56.31/180*pi;   % rad 0.9827949017980069
+a2=135/180*pi;     % rad 2.356194490192345
+a3=225/180*pi;     % rad 3.926990816987241    
+a4=303.69/180*pi;  % rad 5.300390405381579     
 
-g1=20.01/180*pi; % rad   
-g2=0/180*pi;     % rad   
-g3=0/180*pi;     % rad   
-g4=20.01/180*pi; % rad   
+g1=20.01/180*pi; % rad 0.3492403833240653   
+g2=0/180*pi;     % rad 0 
+g3=0/180*pi;     % rad 0  
+g4=20.01/180*pi; % rad 0.3492403833240653   
 
 %wheels' location
 %z=[a1 a2-a1 a3-a2 a4-a3 2*pi-a4];
@@ -137,10 +137,10 @@ end
 
 %==kinematics rules that should be considered for specifying desierd output
  Yd=[Vd
-     (-Vd(1,1)*sin(a1)+Vd(2,1)*cos(a1)+Vd(3,1)*sin(g1)*d)*b
-     (-Vd(1,1)*sin(a2)+Vd(2,1)*cos(a2)+Vd(3,1)*sin(g2)*d)*b
-     (-Vd(1,1)*sin(a3)+Vd(2,1)*cos(a3)+Vd(3,1)*sin(g3)*d)*b 
-     (-Vd(1,1)*sin(a4)+Vd(2,1)*cos(a4)+Vd(3,1)*sin(g4)*d)*b
+     (-Vd(1,1)*sin(a1)+Vd(2,1)*cos(a1)+Vd(3,1)*cos(g1)*d)*b
+     (-Vd(1,1)*sin(a2)+Vd(2,1)*cos(a2)+Vd(3,1)*cos(g2)*d)*b
+     (-Vd(1,1)*sin(a3)+Vd(2,1)*cos(a3)+Vd(3,1)*cos(g3)*d)*b 
+     (-Vd(1,1)*sin(a4)+Vd(2,1)*cos(a4)+Vd(3,1)*cos(g4)*d)*b
  ];
 
 if(6<t)
