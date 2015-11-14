@@ -31,10 +31,10 @@ a2=135/180*pi;     % rad 2.356194490192345
 a3=225/180*pi;     % rad 3.926990816987241    
 a4=303.69/180*pi;  % rad 5.300390405381579     
 
-g1=20.01/180*pi; % rad 0.3492403833240653   
+g1=0;20.01/180*pi; % rad 0.3492403833240653   
 g2=0/180*pi;     % rad 0 
 g3=0/180*pi;     % rad 0  
-g4=20.01/180*pi; % rad 0.3492403833240653   
+g4=0;20.01/180*pi; % rad 0.3492403833240653   
 
 %wheels' location
 %z=[a1 a2-a1 a3-a2 a4-a3 2*pi-a4];
@@ -61,7 +61,7 @@ A(2,7)=ks*cos(a4)/M;
 
 A(3,1)=b*d*ks/J*(sin(a1)*cos(g1)+sin(a2)*cos(g2)+sin(a3)*cos(g3)+sin(a4)*cos(g4));
 A(3,2)=-b*d*ks/J*(cos(a1)*cos(g1)+cos(a2)*cos(g2)+cos(a3)*cos(g3)+cos(a4)*cos(g4));
-A(3,3)=-4*b*d^2*ks/J*(cos(g1)*cos(g1)+cos(g2)*cos(g2)+cos(g3)*cos(g3)+cos(g4)*cos(g4));
+A(3,3)=-b*d^2*ks/J*(cos(g1)*cos(g1)+cos(g2)*cos(g2)+cos(g3)*cos(g3)+cos(g4)*cos(g4));
 A(3,4)=d*ks/J*cos(g1);
 A(3,5)=d*ks/J*cos(g2);
 A(3,6)=d*ks/J*cos(g3);
