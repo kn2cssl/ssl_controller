@@ -18,24 +18,23 @@ N=76/20;                     %
 res=1.2;                     %ohm
 km=25.5/1000;                %Nm/A
 kn=374;                      %rpm/V
-kf=0.0001;                   %unknown 
-ks=0.1;                      %unknown
+kf=0.0001;                                  %unknown 
+ks=0.01;                                    %unknown
 r=28.5/1000;                 %m           
-J=0.0192;                    %kg/m2%           >>modeling needed
+J=0.0192;                    %kg/m2%         >>modeling needed
 Jm=92.5/1000/10000;          %kg/m2
-Jw=0.0000233;                %kg/m2        >>modeling needed
+Jw=0.0000233;                %kg/m2          >>modeling needed
 d=0.084;                     %m         
-M=1.5;                       %kg         >>need measuring
+M=1.5;                       %kg             >>need measuring
 a1=56.31/180*pi;   % rad 0.9827949017980069
 a2=135/180*pi;     % rad 2.356194490192345
 a3=225/180*pi;     % rad 3.926990816987241    
 a4=303.69/180*pi;  % rad 5.300390405381579     
 
-g1=0;20.01/180*pi; % rad 0.3492403833240653   
+g1=0/180*pi;     % rad 0 
 g2=0/180*pi;     % rad 0 
 g3=0/180*pi;     % rad 0  
-g4=0;20.01/180*pi; % rad 0.3492403833240653   
-
+g4=0/180*pi;     % rad 0
 %wheels' location
 %z=[a1 a2-a1 a3-a2 a4-a3 2*pi-a4];
 %pie(z);
@@ -122,40 +121,24 @@ D=zeros(7,4);
 % end
 
 %:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::setpoints
-if (t<2)
-    Vd=[2;0;0];
-end
-if(2<t)
-     Vd=[0;0;4];[2*sin(2*t);0;0];
-end
-if(4<t)
-     Vd=[0;2;0];
-end
-%!!!!!!!!!!!!!!
-
+Vd=[0;0;2];
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %==kinematics rules that should be considered for specifying desierd output
- Yd=[Vd
-     (-Vd(1,1)*sin(a1)+Vd(2,1)*cos(a1)+Vd(3,1)*cos(g1)*d)*b
-     (-Vd(1,1)*sin(a2)+Vd(2,1)*cos(a2)+Vd(3,1)*cos(g2)*d)*b
-     (-Vd(1,1)*sin(a3)+Vd(2,1)*cos(a3)+Vd(3,1)*cos(g3)*d)*b 
-     (-Vd(1,1)*sin(a4)+Vd(2,1)*cos(a4)+Vd(3,1)*cos(g4)*d)*b
+
+ cos_alpha = cos(0);
+ sin_alpha = sin(0);
+	Vx = (  Vd(1,1) * cos_alpha + Vd(2,1) * sin_alpha ) ;
+	Vy = ( -Vd(1,1) * sin_alpha + Vd(2,1) * cos_alpha ) ;
+	Wr =   Vd(3,1) ;
+ Yd=[Vx
+     Vy
+     Wr
+     (-Vx*sin(a1)+Vy*cos(a1)+Wr*cos(g1)*d)*b
+     (-Vx*sin(a2)+Vy*cos(a2)+Wr*cos(g2)*d)*b
+     (-Vx*sin(a3)+Vy*cos(a3)+Wr*cos(g3)*d)*b 
+     (-Vx*sin(a4)+Vy*cos(a4)+Wr*cos(g4)*d)*b
  ];
-
-if(6<t)
-     Yd=[0;0;0;1000;0;0;0];
-end
-if(8<t)
-     Yd=[0;0;0;0;1000;0;0];
-end
-if(10<t)
-     Yd=[0;0;0;0;0;1000;0];
-end
-if(12<t)
-     Yd=[0;0;0;0;0;0;1000];
-end
-
 
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -179,7 +162,18 @@ xd=(C'*C)\C'*Yd;%inv(C'*C)*C'*Yd;
 ud=-inv(B'*B)*B'*A*xd;
 du=-K*(x-xd);%for simulating controller with unnoisy data 
 %du=-K*(xl-xd);%for simulating controller and observer:(x-xd)|(xh-xd)|(xl-xd)
-u=ud+du;
+% u=ud+du
+global u;
+global yn;
+for e=1:463
+    if (real_setpiont(e,2)>t*1000)
+         u=real_setpiont(e,3:6)'/1e+3;
+        temp_y = -Vd(1,1) * sin_alpha + Vd(2,1) * cos_alpha;
+        yn = [real_setpiont(e,6:8)'/1000;real_setpiont(e,9:12)'];
+        break;
+    end
+end
+
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %;;;;;;
@@ -209,6 +203,7 @@ xp=A*x+B*u;
 yn=C*xn; 
 y=C*x;
 
+xwp = x(3);%degree of robot
 %RLS=======================================================================
 global p;
 global q;
@@ -219,7 +214,7 @@ xk=[x;u]';
 
 %theta=[A B]'
 landa=0.99999;
-   p=p/landa-(p*(xk'*xk)*p)/(landa+xk*p*xk')/landa
+   p=p/landa-(p*(xk'*xk)*p)/(landa+xk*p*xk')/landa;
    q=q+xk'*yk;     
                         %x1 
                         %x2
