@@ -1,6 +1,6 @@
 clear all
 clf, echo on
-tspan=[0 12];
+tspan=[0 8.635];
 % x0=[0.5;1;0.1;474;-3553;-1184;3262;0;0;0;0;0;0;0;0];
 x0=[0;0;0;0;0;0;0;0;0;0;0;0;0;0;0];
 % x0=[0;0;0;0;0;0;1000];
@@ -19,6 +19,10 @@ global i;
 global err;
 global T;
 global xu;
+global real_setpiont;
+global u;
+global yn;
+global yo
 %RLS==========
 global p;
 global q;
@@ -53,16 +57,18 @@ kd=zeros(4,1);
 
 
 [t,x] = ode45(@ssl_robot,tspan, x0, ...
-    odeset('OutputFcn','odeplot','MaxStep',1e-3)); 
+    odeset('OutputFcn','odeplot','MaxStep',20*1e-1)); 
 
 figure;
 hold all
 
-plot(T,setpoint(:,1)'*1000,'c:','LineWidth',2)
+% plot(T,setpoint(:,1)'*1000,'r:','LineWidth',2)
+% plot(T,setpoint(:,2)'*1000,'b:','LineWidth',2)
+% plot(T,setpoint(:,3)'*1000,'c:','LineWidth',2)
 %model output
 plot(t,x(:,1)*1000,'r','LineWidth',2)
-plot(t,x(:,2)*1000,'g','LineWidth',2)
-plot(t,x(:,3)*1000,'g','LineWidth',2)
+plot(t,x(:,2)*1000,'b','LineWidth',2)
+plot(t,x(:,3)*1000,'c','LineWidth',2)
 plot(t,x(:,4),'g','LineWidth',2)
 plot(t,x(:,5),'g','LineWidth',2)
 plot(t,x(:,6),'g','LineWidth',2)
@@ -71,9 +77,9 @@ plot(t,x(:,7),'g','LineWidth',2)
 % plot(T,xu,'b:','LineWidth',2)
 
 % Full order observer output
-% plot(t,x(:,8)*1000,'r:','LineWidth',2)
 % plot(t,x(:,9)*1000,'r:','LineWidth',2)
-% plot(t,x(:,10)*1000,'r:','LineWidth',2)
+% plot(t,x(:,10)*1000,'b:','LineWidth',2)
+% plot(t,x(:,11)*1000,'c:','LineWidth',2)
 % plot(t,x(:,11),'r:','LineWidth',2)
 % plot(t,x(:,12),'r:','LineWidth',2)
 % plot(t,x(:,13),'r:','LineWidth',2)
@@ -94,7 +100,7 @@ plot(t,x(:,7),'g','LineWidth',2)
 
 xlabel('Time (sec)')
 ylabel('State Variables')
-legend('setpoint (mm/s)','Vx (mm/s)','State Variables')
+legend('setpoint (vx)','setpoint (vy)','setpoint (wr)','Vx (mm/s)','State Variables')
 % legend('x (mm)','y (mm)','\theta (rad/1000)','\omega_1 (rpm)','\omega_2 (rpm)','\omega_3 (rpm)','\omega_4 (rpm)','setpoint (mm)')
 % legend('Real data','Luenberger observer output','noisy data if there was a sensor')
 set(findall(figure(1),'type','line'),'linewidth',2)
