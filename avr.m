@@ -1815,9 +1815,10 @@ t=(real_setpiont(m,2)-real_setpiont(m-1,2))/1000;
 z=(A*z+B*u+G*(yo(m,:)'-C*z))*t+z;%(A*z+B*u)*t+z;%
 xx=[xx;z'];
 end
-close all
+% close all
 
-figure
+% figure
+clf
 subplot(2,2,1)
 hold all
 plot(real_setpiont(:,7),'b');
@@ -1849,9 +1850,9 @@ plot(xx(:,4),'r')
 legend('FPGA data(driver)','observer output(matlab)')
 title('Subplot 4: \omega_r [rpm]')
 
-figure
-hold all
-plot(real_setpiont(:,3),'b');
+% figure
+% hold all
+% plot(real_setpiont(:,3),'b');
 % plot(real_setpiont(:,4),'g');
 % plot(real_setpiont(:,5),'r');
 % plot(real_setpiont(:,6),'y');
