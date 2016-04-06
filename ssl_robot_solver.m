@@ -1,6 +1,6 @@
-clear all
+    clear all
 clf, echo on
-tspan=[0 8.635];
+tspan=[0 70];
 % x0=[0.5;1;0.1;474;-3553;-1184;3262;0;0;0;0;0;0;0;0];
 x0=[0;0;0;0;0;0;0;0;0;0;0;0;0;0;0];
 % x0=[0;0;0;0;0;0;1000];
@@ -105,12 +105,12 @@ legend('setpoint (vx)','setpoint (vy)','setpoint (wr)','Vx (mm/s)','State Variab
 % legend('Real data','Luenberger observer output','noisy data if there was a sensor')
 set(findall(figure(1),'type','line'),'linewidth',2)
 
-% % controller output(voltage)
-% figure;
-% plot(output','DisplayName','output')
-% xlabel('Time (sec)')
-% ylabel('Voltage(v)')
-% set(findall(figure(3),'type','line'),'linewidth',2)
+% controller output(voltage)
+figure;
+plot(output,'DisplayName','output')
+xlabel('Time (sec)')
+ylabel('Voltage(v)')
+set(findall(figure(3),'type','line'),'linewidth',2)
 
 % err 
 % figure;
