@@ -480,18 +480,19 @@ xl(7,1)=(si+Gl*xm);
 
 xh=X(8:14);% Full order kalman observer output
 
+
 N=76/20;                     %                                           
 res=1.2;                     %ohm
 km=25.5/1000;                %Nm/A
 kn=374;                      %rpm/V
-kf=0.0001;
-ks=0.01;
+kf=0.0001;                               %unknown 
+ks=0.008;                                %unknown
 r=28.5/1000;                 %m           
-J=0.0192;                    %kg/m2%
+J=0.0192;                    %kg/m2%     >>modeling needed
 Jm=92.5/1000/10000;          %kg/m2
-Jw=0.0000233;                %kg/m2
+Jw=0.0000233;                %kg/m2      >>modeling needed
 d=0.084;                     %m         
-M=1.5;                       %kg
+M=1.5;                       %kg         >>need measuring
 a1=56.31/180*pi;   % rad 0.9827949017980069
 a2=135/180*pi;     % rad 2.356194490192345
 a3=225/180*pi;     % rad 3.926990816987241    
@@ -575,19 +576,19 @@ D=zeros(7,4);
 % % zpk(SSLRobot) tf(SSLRobot)
 
 % solve(det(s*eye(7,7)-A))
-% if(t<40)
+if(t<40)
 %     U=[12;12;-12;-12]*sin(t/10);%[0;0;0;0];%
-% end
-% if(t>40)
+Vd=[2;0;0];
+end
+if(t>40)
+    Vd=[0;4;0];
 %     U=[10;10;-10;-10];
-% end
-% 
-% if(t>60)
-%     U=[10;10;-10;-10]*0;
-% end
+end
 
-%:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::setpoints
-Vd=[0;0;2];
+if(t>60)
+    Vd=[0;2;8];
+%     U=[10;10;-10;-10]*0;
+end
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 %==kinematics rules that should be considered for specifying desierd output
@@ -618,7 +619,7 @@ if flag == 0
 % Kpole=place(A,B,pd);
 
 % % % % LQR
-Q=diag([1/2,1/2,1/2,1/1000^2,1/1000^2,1/1000^2,1/1000^2]);
+Q=diag([1/4^2,1/4^2,1/20^2,1/1000^2,1/1000^2,1/1000^2,1/1000^2]);
 R=diag([1/12.6^2,1/12.6^2,1/12.6^2,1/12.6^2]);
 Klqr=lqr(A,B,Q,R);
 K=Klqr;
@@ -628,17 +629,17 @@ xd=(C'*C)\C'*Yd;%inv(C'*C)*C'*Yd;
 ud=-inv(B'*B)*B'*A*xd;
 du=-K*(x-xd);%for simulating controller with unnoisy data 
 %du=-K*(xl-xd);%for simulating controller and observer:(x-xd)|(xh-xd)|(xl-xd)
-% u=ud+du
-global u;
-global yn;
-for e=1:463
-    if (real_setpiont(e,2)>t*1000)
-         u=real_setpiont(e,3:6)'/1e+3;
-        temp_y = -Vd(1,1) * sin_alpha + Vd(2,1) * cos_alpha;
-        yn = [real_setpiont(e,6:8)'/1000;real_setpiont(e,9:12)'];
-        break;
-    end
-end
+u=ud+du;
+% global u;
+% global yn;
+% for e=1:463
+%     if (real_setpiont(e,2)>t*1000)
+%          u=real_setpiont(e,3:6)'/1e+3;
+%         temp_y = -Vd(1,1) * sin_alpha + Vd(2,1) * cos_alpha;
+%         yn = [real_setpiont(e,6:8)'/1000;real_setpiont(e,9:12)'];
+%         break;
+%     end
+% end
 
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -710,8 +711,8 @@ Bh=B;
 % Dh=D;
 uh=u;
 
-V=diag([1 1 200 1 1 1 1]);
-W=diag([0.1 0.1 0.1 0.001 0.001 0.001 0.001]);
+V=diag([0.00001 0.00001 0.00001 0.1 0.1 0.1 0.1]);
+W=diag([0.001 0.001 0.001 100 100 100 100]);
 
 % V=diag([0.05^2 0.05^2 0.01^2 100 100 100 100]);
 % W=diag([0 0 0 0 0 0 0]);
