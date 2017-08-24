@@ -1,6 +1,6 @@
     clear all
 clf, echo on
-tspan=[0 70];
+tspan=[0 8];
 % x0=[0.5;1;0.1;474;-3553;-1184;3262;0;0;0;0;0;0;0;0];
 x0=[0;0;0;0;0;0;0;0;0;0;0;0;0;0;0];
 % x0=[0;0;0;0;0;0;1000];
@@ -75,16 +75,17 @@ plot(t,x(:,6),'g','LineWidth',2)
 plot(t,x(:,7),'g','LineWidth',2)
 % % % % %Luenberger observer output
 % plot(T,xu,'b:','LineWidth',2)
-
+figure;
+hold all
 % Full order observer output
-% plot(t,x(:,9)*1000,'r:','LineWidth',2)
-% plot(t,x(:,10)*1000,'b:','LineWidth',2)
-% plot(t,x(:,11)*1000,'c:','LineWidth',2)
-% plot(t,x(:,11),'r:','LineWidth',2)
-% plot(t,x(:,12),'r:','LineWidth',2)
-% plot(t,x(:,13),'r:','LineWidth',2)
-% plot(t,x(:,13),'r:','LineWidth',2)
-% plot(t,x(:,14),'r:','LineWidth',2)
+plot(t,x(:,9)*1000,'r:','LineWidth',2)
+plot(t,x(:,10)*1000,'b:','LineWidth',2)
+plot(t,x(:,11)*1000,'c:','LineWidth',2)
+plot(t,x(:,11),'r:','LineWidth',2)
+plot(t,x(:,12),'r:','LineWidth',2)
+plot(t,x(:,13),'r:','LineWidth',2)
+plot(t,x(:,13),'r:','LineWidth',2)
+plot(t,x(:,14),'r:','LineWidth',2)
 
 
 
@@ -106,11 +107,11 @@ legend('setpoint (vx)','setpoint (vy)','setpoint (wr)','Vx (mm/s)','State Variab
 set(findall(figure(1),'type','line'),'linewidth',2)
 
 % controller output(voltage)
-figure;
-plot(output,'DisplayName','output')
-xlabel('Time (sec)')
-ylabel('Voltage(v)')
-set(findall(figure(3),'type','line'),'linewidth',2)
+% figure;
+% plot(output,'DisplayName','output')
+% xlabel('Time (sec)')
+% ylabel('Voltage(v)')
+% set(findall(figure(3),'type','line'),'linewidth',2)
 
 % err 
 % figure;

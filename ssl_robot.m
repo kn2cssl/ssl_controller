@@ -613,16 +613,8 @@ end
 %============================================================state feedback
 global K
 if flag == 0
-% % % % pole placement
-%real poles of system:[ -24.04, -3.76, -56.00, -73.02, -19.04, -4.28, -190.84]
-% pd= [ -10, -11, -16, -16, -12, -15, -17]*1.69;
-% Kpole=place(A,B,pd);
 
 % % % % LQR
-%Q=diag([1/4^2,1/4^2,1/20^2,1/1000^2,1/1000^2,1/1000^2,1/1000^2]);
-%R=diag([1/12.6^2,1/12.6^2,1/12.6^2,1/12.6^2]);
-
-%IRAN OPEN 2016
 Q=diag([16/4^2,16/4^2,4/20^2,1/1000^2,1/1000^2,1/1000^2,1/1000^2]);
 R=diag([1/12.6^2,1/12.6^2,1/12.6^2,1/12.6^2]);
 Klqr=lqr(A,B,Q,R);
@@ -634,22 +626,18 @@ ud=-inv(B'*B)*B'*A*xd;
 du=-K*(x-xd);%for simulating controller with unnoisy data 
 %du=-K*(xl-xd);%for simulating controller and observer:(x-xd)|(xh-xd)|(xl-xd)
 u=ud+du;
-% global u;
-% global yn;
-% for e=1:463
-%     if (real_setpiont(e,2)>t*1000)
-%          u=real_setpiont(e,3:6)'/1e+3;
-%         temp_y = -Vd(1,1) * sin_alpha + Vd(2,1) * cos_alpha;
-%         yn = [real_setpiont(e,6:8)'/1000;real_setpiont(e,9:12)'];
-%         break;
-%     end
-% end
+ global u;
+ global yn;
+ for e=1:463
+     if (real_setpiont(e,2)>t*1000)
+          u=real_setpiont(e,3:6)'/1e+3;
+         temp_y = -Vd(1,1) * sin_alpha + Vd(2,1) * cos_alpha;
+         yn = [real_setpiont(e,6:8)'/1000;real_setpiont(e,9:12)'];
+         break;
+     end
+ end
 
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-%;;;;;;
-%PD_CTS
-%%%%%%%
 
 %=============================================================pi controller
 % global i
@@ -667,11 +655,12 @@ for e=1:4
     end
 end
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-xp=A*x+B*u;
+ux = [-1;-1;1;1];
+ux = u;
+xp=A*x+B*ux;
 % xp=[A B]*[x;u];
-yn=C*xn; 
-y=C*x;
+% yn=C*xn; 
+% y=C*x;
 
 xwp = x(3);%degree of robot
 %RLS=======================================================================
@@ -727,32 +716,10 @@ if flag==0
 end
 
 
-xhp=Ah*xh+Bh*uh;%+G*(y-Ch*xh);
+xhp=Ah*xh+Bh*uh+G*(y-Ch*xh);
 
 %;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-%luenberger observer=======================================================
-% xm=xn(1:6);
-% si=X(15);
-% 
-% Amm=A(1:6,1:6);
-% Amu=A(1:6,7);
-% Aum=A(7,1:6);
-% Auu=A(7,7);
-% 
-% Bm=B(1:6,:);
-% Bu=B(7,:);
-% Dh=D;
-% uh=u;
-% if flag == 0
-% Vl=diag([0.05^2 0.05^2 0.01^2 100 100 100]);
-% Wl=diag([0.01]);
-% 
-% Gl=lqr(Auu',Amu',Wl,Vl)';
-% end
-% 
-% sip=(Auu-Gl*Amu)*si+(Auu*Gl+Aum-Gl*Amm-Gl*Amu*Gl)*xm+(Bu-Gl*Bm)*uh;
-%;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Xp=[xp;xhp;xwp];
 
