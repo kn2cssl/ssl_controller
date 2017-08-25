@@ -13,10 +13,10 @@ if init_flag ==1
     L=0.00056;
     km=25.5/1000;                %Nm/A
     kn=374;                          %rpm/V
-    kf=0.00085;
-    kt=0.008;                                  %unknown
+    kf=0.0001;
+    kt=0.01;                                  %unknown
     rw=28.5/1000;                 %m           
-    Jc=0.0192;                    %kg/m2%     >>modeling needed
+    Jc=0.02;                    %kg/m2%     >>modeling needed
     Jm=92.5/1000/10000;          %kg/m2
     Jw=0.0000233;                %kg/m2      >>modeling needed
     rc=0.084;                     %m         
@@ -91,22 +91,22 @@ if init_flag ==1
     A(7,7)=-rw*kt/Je-kf/Je;
     A(7,11)=N*km/Je;
 
-    A(8,4)=-1/(N*L*kn);
+    A(8,4)=-N/(L*kn);
     A(8,8)=-R/L;
 
-    A(9,5)=-1/(N*L*kn);
+    A(9,5)=-N/(L*kn);
     A(9,9)=-R/L;
 
-    A(10,6)=-1/(N*L*kn);
+    A(10,6)=-N/(L*kn);
     A(10,10)=-R/L;
 
-    A(11,7)=-1/(N*L*kn);
+    A(11,7)=-N/(L*kn);
     A(11,11)=-R/L;
     
     B=zeros(11,4);
 
-    B(8,1)=1/L;
-    B(9,2)=1/L;
+    B(8,1) =1/L;
+    B(9,2) =1/L;
     B(10,3)=1/L;
     B(11,4)=1/L;
     
@@ -124,7 +124,11 @@ global r_d_size;
 % u = [1;1;-1;-1];
  for e=1:r_d_size(1,1)
      if (real_data(e,1)>t*1000)
-          u=-real_data(e,2:5)'/1e+3;
+%           u=-real_data(e,2:5)'/1e+3;
+          u=-[real_data(e,2)/1e+3-sign(real_data(e,2))*2.9
+              real_data(e,3)/1e+3-sign(real_data(e,3))*2.9
+              real_data(e,4)/1e+3-sign(real_data(e,4))*2.9
+              real_data(e,5)/1e+3-sign(real_data(e,5))*2.9];
          break;
      end
  end

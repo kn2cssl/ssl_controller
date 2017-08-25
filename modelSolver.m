@@ -1,5 +1,4 @@
 clear all
-close all
 clc
 clf, echo on
 tspan=[0 18];
@@ -15,24 +14,31 @@ real_data = [real_data(:,1:8), -real_data(:,9:16)];
 [t,x] = ode45(@dynamicModel,tspan, x0, odeset('OutputFcn','odeplot','MaxStep',20*1e-1)); 
 
 %=Robot's speed============================================================
+close all
 figure;
 subplot(1,3,1);
 hold all
 plot(t,x(:,1),'r','LineWidth',2)
-plot(real_data(:,1)/1000,real_data(:,6)/1000,':b*','LineWidth',2)
+plot(real_data(:,1)/1000,real_data(:,6)/1000,':b','LineWidth',2)
 legend('V_x  (simulation)','V_x (real)');
+xlabel('Time [sec]');
+ylabel('Speed [m/s]');
 
 subplot(1,3,2);
 hold all
 plot(t,x(:,2),'r','LineWidth',2)
-plot(real_data(:,1)/1000,real_data(:,7)/1000,':b*','LineWidth',2)
+plot(real_data(:,1)/1000,real_data(:,7)/1000,':b','LineWidth',2)
 legend('V_y  (simulation)','V_y (real)');
+xlabel('Time [sec]');
+ylabel('Speed [m/s]');
 
 subplot(1,3,3);
 hold all
 plot(t,x(:,3),'r','LineWidth',2)
-plot(real_data(:,1)/1000,real_data(:,8)/1000,':b*','LineWidth',2)
+plot(real_data(:,1)/1000,real_data(:,8)/1000,':b','LineWidth',2)
 legend('\omega_c  (simulation)','\omega_c (real)');
+xlabel('Time [sec]');
+ylabel('Speed [rad/s]');
 %--------------------------------------------------------------------------
 
 %=Wheels' speed============================================================
@@ -40,8 +46,10 @@ figure;
 subplot(2,2,1);
 hold all
 plot(t,x(:,4),'r','LineWidth',2)
-plot(real_data(:,1)/1000,real_data(:,9),':g*','LineWidth',2)
+plot(real_data(:,1)/1000,real_data(:,9),':b','LineWidth',2)
 legend('\omega_w_1  (simulation)','\omega_w_1 (real)');
+xlabel('Time [sec]');
+ylabel('Speed [rad/s]');
 %--------------------------------------------------------------------------
 
 %=Currents=================================================================
@@ -49,8 +57,10 @@ figure;
 subplot(2,2,1);
 hold all
 plot(t,x(:,8),'r','LineWidth',2)
-plot(real_data(:,1)/1000,real_data(:,13)/1000,':c*','LineWidth',2)
+plot(real_data(:,1)/1000,real_data(:,13)/1000,':b','LineWidth',2)
 legend('i_m_1  (simulation)','i_m_1 (real)');
+xlabel('Time [sec]');
+ylabel('Current [ampere]');
 %--------------------------------------------------------------------------
 
 % plot(t,x(:,5),'g','LineWidth',2)
@@ -75,5 +85,3 @@ legend('i_m_1  (simulation)','i_m_1 (real)');
 % plot(t,x(:,13),'r:','LineWidth',2)
 % plot(t,x(:,14),'r:','LineWidth',2)
 
-% xlabel('Time (sec)')
-% ylabel('State Variables')
