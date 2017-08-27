@@ -1,33 +1,35 @@
 function Xp=dynamicModel(t,X)
-x=X(1:11);;
+x=X(1:11);
 global init_flag;
 global A;
 global B;
 global C;
+global K;
 global G;
 if init_flag ==1
     init_flag = 0;
     
     N=76/20;                     %                                           
-    R=1.2;                     %ohm
-    L=0.00056;
+    R=1.2;                       %ohm
+    L=0.00056;                   %
     km=25.5/1000;                %Nm/A
-    kn=374;                          %rpm/V
+    kn=374;                      %rpm/V
     kf=0.0001;
-    kt=0.01;                                  %unknown
-    rw=28.5/1000;                 %m           
-    Jc=0.02;                    %kg/m2%     >>modeling needed
+    kt=0.01;                      
+    rw=28.5/1000;                %m           
+    Jc=0.02;                     %kg/m2%     >>modeling needed
     Jm=92.5/1000/10000;          %kg/m2
     Jw=0.0000233;                %kg/m2      >>modeling needed
-    rc=0.084;                     %m         
-    mc=1.5;                       %kg         >>need measuring
-    a1=56.31/180*pi;   % rad 0.9827949017980069
-    a2=135/180*pi;     % rad 2.356194490192345
-    a3=225/180*pi;     % rad 3.926990816987241    
-    a4=303.69/180*pi;  % rad 5.300390405381579   
+    rc=0.084;                    %m         
+    mc=1.5;                      %kg         >>measuring needed
+    a1=56.31/180*pi;             % rad 0.9827949017980069
+    a2=135/180*pi;               % rad 2.356194490192345
+    a3=225/180*pi;               % rad 3.926990816987241    
+    a4=303.69/180*pi;            % rad 5.300390405381579  
+    
     b=60/(2*pi*rw);
     Je=Jw+N^2*Jm;
-    ca=N*km/(Je*R);  
+    Vmax = 12.6;
     
     A=zeros(11,11);
 
@@ -111,6 +113,10 @@ if init_flag ==1
     B(11,4)=1/L;
     
     C=eye(11,11);
+    
+    Q=diag([1,1,0.01,0,0,0,0,0,0,0,0]);
+    R=diag([1/Vmax^2,1/Vmax^2,1/Vmax^2,1/Vmax^2]);
+    K=lqr(A,B,Q,R);
     
     V=diag([0.00001 0.00001 0.00001    0.1 0.1 0.1 0.1    0.01 0.01 0.01 0.01]);
     W=diag([0.001 0.001 0.001         100 100 100 100     1 1 1 1]);
