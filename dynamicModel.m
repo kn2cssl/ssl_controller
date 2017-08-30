@@ -14,12 +14,12 @@ if init_flag ==1
     L=0.00056;                   %
     km=25.5/1000;                %Nm/A
     kn=374;                      %rpm/V
-    kf=0.0001;
-    kt=0.01;                      
+    kf=0.0001;                   %           >>measuring needed
+    kt=0.1;                      %           >>measuring needed                   
     rw=28.5/1000;                %m           
-    Jc=0.02;                     %kg/m2%     >>modeling needed
-    Jm=92.5/1000/10000;          %kg/m2
-    Jw=0.0000233;                %kg/m2      >>modeling needed
+    Jc=0.00139652802;            %kg*m2%     >>SOLIDWORKS
+    Jm=92.5/1000/10000;          %kg*m2
+    Jw=0.00001;                  %kg*m2      >>SOLIDWORKS
     rc=0.084;                    %m         
     mc=1.5;                      %kg         >>measuring needed
     a1=56.31/180*pi;             % rad 0.9827949017980069
@@ -40,10 +40,6 @@ if init_flag ==1
     A(1,5) =kt*sin(a2)/mc;
     A(1,6) =kt*sin(a3)/mc;
     A(1,7) =kt*sin(a4)/mc;
-    A(1,8) =0;
-    A(1,9) =0;
-    A(1,10)=0;
-    A(1,11)=0;
 
     A(2,1)=b*kt/(2*mc)*(sin(2*a1)+sin(2*a2)+sin(2*a3)+sin(2*a4));
     A(2,2)=-b*kt/mc*(cos(a1)^2+cos(a2)^2+cos(a3)^2+cos(a4)^2);
@@ -52,10 +48,6 @@ if init_flag ==1
     A(2,5)=-kt*cos(a2)/mc;
     A(2,6)=-kt*cos(a3)/mc;
     A(2,7)=-kt*cos(a4)/mc;
-    A(2,8) =0;
-    A(2,9) =0;
-    A(2,10)=0;
-    A(2,11)=0;
 
     A(3,1)=b*rc*kt/Jc*(sin(a1)+sin(a2)+sin(a3)+sin(a4));
     A(3,2)=-b*rc*kt/Jc*(cos(a1)+cos(a2)+cos(a3)+cos(a4));
@@ -64,10 +56,6 @@ if init_flag ==1
     A(3,5)=-rc*kt/Jc;
     A(3,6)=-rc*kt/Jc;
     A(3,7)=-rc*kt/Jc;
-    A(3,8) =0;
-    A(3,9) =0;
-    A(3,10)=0;
-    A(3,11)=0;
 
     A(4,1)=rw*kt*b*sin(a1)/Je;
     A(4,2)=-rw*kt*b*cos(a1)/Je;
@@ -118,8 +106,8 @@ if init_flag ==1
     R=diag([1/Vmax^2,1/Vmax^2,1/Vmax^2,1/Vmax^2]);
     K=lqr(A,B,Q,R);
     
-    V=diag([0.00001 0.00001 0.00001    0.1 0.1 0.1 0.1    0.01 0.01 0.01 0.01]);
-    W=diag([0.001 0.001 0.001         100 100 100 100     1 1 1 1]);
+    V=diag([0.0012 0.0012 0.04   100 100 100 100   1 1 1 1]);
+    W=diag([0.64  0.64 0.03   2500 2500 2500 2500  0.01 0.01 0.01 0.01]);
     
     G=lqr(A',C',W,V)';
 end
@@ -129,22 +117,21 @@ global real_data;
 global r_d_size;
 % u = [1;1;-1;-1];
  for e=1:r_d_size(1,1)
-     if (real_data(e,1)>t*1000)
+     if (real_data(e,1)>t)
 %           u=-real_data(e,2:5)'/1e+3;
-          u=-[real_data(e,2)/1e+3-sign(real_data(e,2))*2.9
-              real_data(e,3)/1e+3-sign(real_data(e,3))*2.9
-              real_data(e,4)/1e+3-sign(real_data(e,4))*2.9
-              real_data(e,5)/1e+3-sign(real_data(e,5))*2.9];
+          u=[real_data(e,2)-sign(real_data(e,2))*2.9
+             real_data(e,3)-sign(real_data(e,3))*2.9
+             real_data(e,4)-sign(real_data(e,4))*2.9
+             real_data(e,5)-sign(real_data(e,5))*2.9];
+          y=real_data(e,6:16)';
          break;
      end
  end
  
- 
 xp=A*x+B*u;
-y=C*x;
+% y=C*x;
 
 %full observer=============================================================
-y=real_data(6:16)';
 xh=X(12:22);
 Ah=A;
 Ch=C;
