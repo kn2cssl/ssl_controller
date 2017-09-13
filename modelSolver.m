@@ -1,7 +1,7 @@
 clear all
 clc
 clf, echo on
-tspan=[0 32.7];
+tspan=[0 20];
 x0=[0;0;0;0;0;0;0;0;0;0;0;0;0;0];
 global init_flag ;
 init_flag = 1;
@@ -12,12 +12,16 @@ global r_d_size ;
 global p;
 global q;
 global theta;
+global kk;
+kk = [0,0];
 theta = zeros(11,7);
 q=zeros(11,7);
-p=eye(11)*1000 ;
+for n = 1:9
+    p(:,:,n)=eye(11)*1000;
+end
 %;;;;;;;;;;;;;
 
-real_data = importdata('ssl-d-13960608-5-forRLS.txt');
+real_data = importdata('ssl-d-13960608-4-7ss-1.txt');
 r_d_size =  size(real_data);
 real_data = [real_data(:,1:8)/1000, real_data(:,9:12), real_data(:,13:16)/1000];
 
@@ -33,11 +37,13 @@ figure;
 subplot(2,2,1);
 hold all
 plot(real_data(:,1),real_data(:,6),':b','LineWidth',2)
-plot(t,x(:,1),'r','LineWidth',2)
-plot(t,x(:,8),'--g','LineWidth',2)
+% plot(t,x(:,8),'r','LineWidth',2)
+plot(real_data2(:,1),real_data2(:,6),'r','LineWidth',2)
+plot(real_data(:,1),real_data(:,13),'--g','LineWidth',2)
 legend('V_x (real)','V_x  (kalman)','V_x  (setpoint)');
 xlabel('Time [sec]');
 ylabel('Speed [m/s]');
+title('Trapezoidal Profile Test')
 title('LTR Test')
 title('Feed Test')
 
@@ -45,22 +51,26 @@ title('Feed Test')
 subplot(2,2,2);
 hold all
 plot(real_data(:,1),real_data(:,7),':b','LineWidth',2)
-plot(t,x(:,2),'r','LineWidth',2)
-plot(t,x(:,9),'--g','LineWidth',2)
-legend('V_y (real)','V_y  (simulation)');
+% plot(t,x(:,2),'r','LineWidth',2)
+plot(real_data2(:,1),real_data2(:,7),'r','LineWidth',2)
+plot(real_data(:,1),real_data(:,14),'--g','LineWidth',2)
+legend('V_y (real)','V_y  (kalman)','V_y  (setpoint)');
 xlabel('Time [sec]');
 ylabel('Speed [m/s]');
+title('Trapezoidal Profile Test')
 title('Model Test')
 
 % figure;
 subplot(2,2,3);
 hold all
 plot(real_data(:,1),real_data(:,8),':b','LineWidth',2)
-plot(t,x(:,3),'r','LineWidth',2)
-plot(t,x(:,10),'--g','LineWidth',2)
-legend('\omega_c (real)','\omega_c  (simulation)');
+% plot(t,x(:,3),'r','LineWidth',2)
+plot(real_data2(:,1),real_data2(:,8),'r','LineWidth',2)
+plot(real_data(:,1),real_data(:,15),'--g','LineWidth',2)
 xlabel('Time [sec]');
 ylabel('Speed [rad/s]');
+title('Trapezoidal Profile Test')
+legend('\omega_c (real)','\omega_c  (kalman)','\omega_c  (setpoint)');
 title('Model Test')
 %--------------------------------------------------------------------------
 
